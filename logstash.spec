@@ -79,3 +79,10 @@ rm -rf %{buildroot}
 %attr(755, logstash, logstash) %{_var}/run/logstash
 
 %changelog
+
+* Mon Apr 2 2012 Artem Veremey <artem@veremey.net> - 1.1.0.1-7
+- Added Java Service Wrapper
+- Converted references to macrosses 
+- Added logstash user
+- Cleaned up files
+
