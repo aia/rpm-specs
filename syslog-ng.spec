@@ -139,7 +139,7 @@ make DESTDIR=%{buildroot} install
 %{__install} -p -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/sysconfig/%{name}
 
 %{__install} -d -m 755 %{buildroot}%{_sysconfdir}/logrotate.d
-%{__install} -p -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}/logrotate.d/syslog
+%{__install} -p -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}/logrotate.d/syslog-ng
 
 # create the local state dir
 %{__install} -d -m 755 %{buildroot}/%{_sharedstatedir}/%{name}
@@ -224,7 +224,7 @@ fi
 %config(noreplace) %{_sysconfdir}/%{name}/modules.conf
 %config(noreplace) %{_sysconfdir}/%{name}/scl.conf
 %config(noreplace) %{_sysconfdir}/sysconfig/%{name}
-%config(noreplace) %{_sysconfdir}/logrotate.d/syslog
+%config(noreplace) %{_sysconfdir}/logrotate.d/syslog-ng
 %{_sysconfdir}/init.d/%{name}
 %dir %{_sharedstatedir}/%{name}
 %{_sbindir}/%{name}
