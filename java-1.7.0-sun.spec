@@ -34,7 +34,7 @@
 %define priority        1500
 %define javaver         1.7.0
 %define cvsver          7
-%define buildver        6
+%define buildver        10
 
 # TODO: Think about using conditionals for version variants.
 %define cvsversion	%{cvsver}u%{buildver}
@@ -42,7 +42,7 @@
 %define javaws_ver      %{javaver}
 %define javaws_version  %{cvsversion}
 
-%define toplevel_dir    jdk%{javaver}_0%{buildver}
+%define toplevel_dir    jdk%{javaver}_%{buildver}
 
 %define sdklnk          java-%{javaver}-%{origin}
 %define jrelnk          jre-%{javaver}-%{origin}
@@ -703,6 +703,7 @@ fi
 %dir %{_jvmdir}/%{jredir}/lib/security
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/cacerts
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.policy
+%config(noreplace) %{_jvmdir}/%{jredir}/lib/security/javafx.policy
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.security
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/javaws.policy
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/blacklist
