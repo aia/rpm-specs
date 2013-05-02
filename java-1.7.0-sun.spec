@@ -34,7 +34,7 @@
 %define priority        1500
 %define javaver         1.7.0
 %define cvsver          7
-%define buildver        6
+%define buildver        21
 
 # TODO: Think about using conditionals for version variants.
 %define cvsversion	%{cvsver}u%{buildver}
@@ -42,7 +42,7 @@
 %define javaws_ver      %{javaver}
 %define javaws_version  %{cvsversion}
 
-%define toplevel_dir    jdk%{javaver}_0%{buildver}
+%define toplevel_dir    jdk%{javaver}_%{buildver}
 
 %define sdklnk          java-%{javaver}-%{origin}
 %define jrelnk          jre-%{javaver}-%{origin}
@@ -707,6 +707,7 @@ fi
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/javaws.policy
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/blacklist
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/trusted.libraries
+%config(noreplace) %{_jvmdir}/%{jredir}/lib/security/javafx.policy
 %ghost %{_jvmdir}/%{jredir}/lib/security/local_policy.jar
 %ghost %{_jvmdir}/%{jredir}/lib/security/US_export_policy.jar
 %{_jvmdir}/%{jrelnk}
@@ -802,6 +803,9 @@ fi
 %ghost %{fontdir}/encodings.dir
 
 %changelog
+* Wed Mar 1 2013 Josh Toft <josh@likeness.com> - 0:1.7.0.21-1.2jpp.im
+- Bumped to 1.7.0_21
+
 * Wed Jun 13 2012 Henning P. Schmiedehausen <henning@likeness.com> - 0:1.7.0.5-1.1jpp.im
 - Bumped to 1.7.0_05
 
