@@ -1,5 +1,5 @@
 %define rubyver		1.9.3
-%define rubyminorver	p125
+%define rubyminorver	p448
 
 Name:		ruby19
 Version:	%{rubyver}%{rubyminorver}
@@ -10,7 +10,7 @@ Provides:       ruby(abi) = 1.9
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:	autoconf automake readline readline-devel ncurses ncurses-devel gdbm gdbm-devel glibc-devel tcl-devel gcc unzip openssl-devel db4-devel byacc make libyaml-devel libffi-devel
 Source0:	ftp://ftp.ruby-lang.org/pub/ruby/ruby-%{rubyver}-%{rubyminorver}.tar.gz
-Patch0: ruby-1.9.3-p125-gc.patch
+Patch0: ruby-1.9.3-p448-gc.patch
 Patch1: ruby-1.9.3-p125-debug.patch
 Summary:	An interpreter of object-oriented scripting language
 Group:		Development/Languages

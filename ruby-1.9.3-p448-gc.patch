@@ -1,0 +1,131 @@
+diff -Naur ruby-1.9.3-p125/gc.c ruby-1.9.3-p125-gcpatch/gc.c
+--- ruby-1.9.3-p125/gc.c	2012-02-15 14:34:48.000000000 -0800
++++ ruby-1.9.3-p125-gcpatch/gc.c	2012-03-03 18:55:01.000000000 -0800
+@@ -319,7 +319,7 @@
+     size_t unused_cache_size;
+ } mark_stack_t;
+ 
+-#define CALC_EXACT_MALLOC_SIZE 0
++#define CALC_EXACT_MALLOC_SIZE 1
+ 
+ typedef struct rb_objspace {
+     struct {
+@@ -731,7 +731,7 @@
+     if (size == 0) size = 1;
+ 
+ #if CALC_EXACT_MALLOC_SIZE
+-    size += sizeof(size_t);
++    // size += sizeof(size_t);
+ #endif
+ 
+     if ((ruby_gc_stress && !ruby_disable_gc_stress) ||
+@@ -750,8 +750,8 @@
+ #if CALC_EXACT_MALLOC_SIZE
+     objspace->malloc_params.allocated_size += size;
+     objspace->malloc_params.allocations++;
+-    ((size_t *)mem)[0] = size;
+-    mem = (size_t *)mem + 1;
++    //((size_t *)mem)[0] = size;
++    //mem = (size_t *)mem + 1;
+ #endif
+ 
+     return mem;
+@@ -792,9 +792,9 @@
+ 	garbage_collect_with_gvl(objspace);
+ 
+ #if CALC_EXACT_MALLOC_SIZE
+-    size += sizeof(size_t);
++    //size += sizeof(size_t);
+     objspace->malloc_params.allocated_size -= size;
+-    ptr = (size_t *)ptr - 1;
++    //ptr = (size_t *)ptr - 1;
+ #endif
+ 
+     mem = realloc(ptr, size);
+@@ -810,8 +810,8 @@
+ 
+ #if CALC_EXACT_MALLOC_SIZE
+     objspace->malloc_params.allocated_size += size;
+-    ((size_t *)mem)[0] = size;
+-    mem = (size_t *)mem + 1;
++    //((size_t *)mem)[0] = size;
++    //mem = (size_t *)mem + 1;
+ #endif
+ 
+     return mem;
+@@ -821,11 +821,11 @@
+ vm_xfree(rb_objspace_t *objspace, void *ptr)
+ {
+ #if CALC_EXACT_MALLOC_SIZE
+-    size_t size;
+-    ptr = ((size_t *)ptr) - 1;
+-    size = ((size_t*)ptr)[0];
+-    objspace->malloc_params.allocated_size -= size;
+-    objspace->malloc_params.allocations--;
++    //size_t size;
++    //ptr = ((size_t *)ptr) - 1;
++    //size = ((size_t*)ptr)[0];
++    //objspace->malloc_params.allocated_size -= size;
++    //objspace->malloc_params.allocations--;
+ #endif
+ 
+     free(ptr);
+@@ -3414,7 +3414,14 @@
+ static VALUE
+ gc_malloc_allocated_size(VALUE self)
+ {
+-    return UINT2NUM((&rb_objspace)->malloc_params.allocated_size);
++    //return UINT2NUM((&rb_objspace)->malloc_params.allocated_size);
++    return UINT2NUM(malloc_allocated_size());
++}
++
++VALUE
++malloc_allocated_size(void)
++{
++    return (&rb_objspace)->malloc_params.allocated_size;
+ }
+ 
+ /*
+@@ -3429,7 +3436,14 @@
+ static VALUE
+ gc_malloc_allocations(VALUE self)
+ {
+-    return UINT2NUM((&rb_objspace)->malloc_params.allocations);
++    //return UINT2NUM((&rb_objspace)->malloc_params.allocations);
++    return UINT2NUM(malloc_allocations());
++}
++
++VALUE
++malloc_allocations(void)
++{
++    return (&rb_objspace)->malloc_params.allocations;
+ }
+ #endif
+ 
+diff -Naur ruby-1.9.3-p125/include/ruby/intern.h ruby-1.9.3-p125-gcpatch/include/ruby/intern.h
+--- ruby-1.9.3-p125/include/ruby/intern.h	2012-02-08 05:30:04.000000000 -0800
++++ ruby-1.9.3-p125-gcpatch/include/ruby/intern.h	2012-03-03 18:55:01.000000000 -0800
+@@ -431,6 +431,8 @@
+ VALUE rb_gc_enable(void);
+ VALUE rb_gc_disable(void);
+ VALUE rb_gc_start(void);
++VALUE malloc_allocated_size(void);
++VALUE malloc_allocations(void);
+ #define Init_stack(addr) ruby_init_stack(addr)
+ void rb_gc_set_params(void);
+ /* hash.c */
+diff -Naur ruby-1.9.3-p125/vm_core.h ruby-1.9.3-p125-gcpatch/vm_core.h
+--- ruby-1.9.3-p125/vm_core.h	2011-12-29 21:56:53.000000000 -0800
++++ ruby-1.9.3-p125-gcpatch/vm_core.h	2012-03-03 18:55:01.000000000 -0800
+@@ -682,7 +682,11 @@
+ /* for thread */
+ 
+ #if RUBY_VM_THREAD_MODEL == 2
++#if defined __GNUC__ && __GNUC__ >= 4
++#pragma GCC visibility push(default)
+ RUBY_EXTERN rb_thread_t *ruby_current_thread;
++#pragma GCC visibility pop
++#endif
+ extern rb_vm_t *ruby_current_vm;
+ 
+ #define GET_VM() ruby_current_vm
