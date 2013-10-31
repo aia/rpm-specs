@@ -34,7 +34,7 @@
 %define priority        1500
 %define javaver         1.7.0
 %define cvsver          7
-%define buildver        6
+%define buildver        10
 
 # TODO: Think about using conditionals for version variants.
 %define cvsversion	%{cvsver}u%{buildver}
@@ -42,7 +42,7 @@
 %define javaws_ver      %{javaver}
 %define javaws_version  %{cvsversion}
 
-%define toplevel_dir    jdk%{javaver}_0%{buildver}
+%define toplevel_dir    jdk%{javaver}_%{buildver}
 
 %define sdklnk          java-%{javaver}-%{origin}
 %define jrelnk          jre-%{javaver}-%{origin}
@@ -81,7 +81,7 @@
 
 Name:           java-%{javaver}-%{origin}
 Version:        %{javaver}.%{buildver}
-Release:        1.2jpp.im
+Release:        1.3jpp.im
 Epoch:          0
 Summary:        Java Runtime Environment for %{name}
 License:        Sun Binary Code License
@@ -90,6 +90,8 @@ URL:            http://java.sun.com/j2se/%{javaver}
 Source0:        jdk-%{cvsversion}-linux-%{target_cpu}.tar.gz
 Source1:        %{name}-register-java-fonts.xsl
 Source2:        %{name}-unregister-java-fonts.xsl
+Source3:	US_export_policy.jar
+Source4:	local_policy.jar
 NoSource:       0
 Provides:       jre-%{javaver}-%{origin} = %{epoch}:%{version}-%{release}
 Provides:       jre-%{origin} = %{epoch}:%{version}-%{release}
@@ -98,6 +100,15 @@ Provides:       java-%{origin} = %{epoch}:%{version}-%{release}
 Provides:       java = %{epoch}:%{javaver}
 Requires:       /usr/sbin/update-alternatives
 Requires:       jpackage-utils >= 0:1.5.38
+Requires:	xorg-x11-font-utils
+Requires:	cairo
+Requires:	pango
+Requires:	libXi
+Requires:	atk
+Requires:	libXtst
+Requires:	libXxf86vm
+Requires:	mesa-libGL
+Requires:	gtk2
 Conflicts:      kaffe
 BuildArch:      i586 x86_64
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-buildroot
@@ -166,7 +177,7 @@ Note!  This package supports browsers built with GCC 3.2 and later.
 Summary:        TrueType fonts for %{origin} JVMs
 Group:          Text Processing/Fonts
 Requires:       %{name} = %{epoch}:%{version}-%{release}, %{_bindir}/ttmkfdir
-Requires:       xorg-x11-font-utils, mktemp
+Requires:       xorg-x11-font-utils, mktemp, ttmkfdir
 Requires:       %{_bindir}/xsltproc, %{_bindir}/perl
 Provides:       java-fonts = %{epoch}:%{javaver}, java-%{javaver}-fonts
 Conflicts:      java-%{javaver}-ibm-fonts, java-%{javaver}-blackdown-fonts
@@ -256,11 +267,15 @@ install -d -m 755 $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/endorsed
 # jce policy file handling
 install -d -m 755 $RPM_BUILD_ROOT%{_jvmprivdir}/%{name}/jce/vanilla
 for file in local_policy.jar US_export_policy.jar; do
-  mv $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/security/$file \
-    $RPM_BUILD_ROOT%{_jvmprivdir}/%{name}/jce/vanilla
+  #mv $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/security/$file \
+  #  $RPM_BUILD_ROOT%{_jvmprivdir}/%{name}/jce/vanilla
+  rm $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/security/$file
   # for ghosts
   touch $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/security/$file
 done
+
+cp %{SOURCE3} $RPM_BUILD_ROOT%{_jvmprivdir}/%{name}/jce/vanilla
+cp %{SOURCE4} $RPM_BUILD_ROOT%{_jvmprivdir}/%{name}/jce/vanilla
 
 # versionless symlinks
 pushd $RPM_BUILD_ROOT%{_jvmdir}
@@ -705,6 +720,7 @@ fi
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.policy
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.security
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/javaws.policy
+%config(noreplace) %{_jvmdir}/%{jredir}/lib/security/javafx.policy
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/blacklist
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/trusted.libraries
 %ghost %{_jvmdir}/%{jredir}/lib/security/local_policy.jar
